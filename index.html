@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuralStudy — AI Study Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-1"></div>
+  <div class="bg-glow glow-2"></div>
+  <canvas id="particleCanvas"></canvas>
+
+  <div class="app-wrapper">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M2 17l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="logo-text">NeuralStudy</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-section="upload">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span>Upload</span>
+        </button>
+        <button class="nav-item" data-section="notes" id="navNotes" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span>Notes</span>
+        </button>
+        <button class="nav-item" data-section="summary" id="navSummary" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/></svg>
+          <span>Summary</span>
+        </button>
+        <button class="nav-item" data-section="questions" id="navQuestions" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>Questions</span>
+        </button>
+        <button class="nav-item" data-section="chat" id="navChat" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          <span>Chat</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-stats" id="sidebarStats" style="display:none">
+        <div class="stat-item">
+          <span class="stat-label">Characters</span>
+          <span class="stat-value" id="statChars">—</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Words</span>
+          <span class="stat-value" id="statWords">—</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Powered by</span>
+          <span class="stat-value" style="color:#4285f4">Gemini</span>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="api-status">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="apiStatusText">Ready</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+      <!-- UPLOAD -->
+      <section class="section active" id="section-upload">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">Upload Your Notes</h1>
+            <p class="section-sub">Drag & drop or click to browse — PDF, TXT, Markdown supported</p>
+          </div>
+        </div>
+
+        <div class="upload-area" id="uploadArea">
+          <input type="file" id="fileInput" accept=".txt,.pdf,.md" hidden />
+
+          <div class="upload-inner" id="uploadInner">
+            <div class="upload-icon-wrap">
+              <div class="upload-orb"></div>
+              <svg class="upload-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <h2 class="upload-title">Drop your study notes here</h2>
+            <p class="upload-hint">PDF · TXT · Markdown — up to 10 MB</p>
+            <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Browse Files
+            </button>
+          </div>
+
+          <div class="upload-progress" id="uploadProgress" style="display:none">
+            <div class="progress-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="progress-info">
+              <span class="progress-filename" id="progressFilename">document.pdf</span>
+              <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+              <span class="progress-label" id="progressLabel">Extracting text…</span>
+            </div>
+          </div>
+
+          <div class="upload-success" id="uploadSuccess" style="display:none">
+            <div class="success-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="success-info">
+              <span class="success-filename" id="successFilename"></span>
+              <span class="success-meta" id="successMeta"></span>
+            </div>
+            <button class="btn-icon" title="Upload new file" onclick="resetUpload()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="action-cards" id="actionCards" style="display:none">
+          <div class="action-card" onclick="goToSection('summary'); triggerSummarize()">
+            <div class="action-card-icon cyan">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>
+            </div>
+            <div>
+              <h3>Summarize Notes</h3>
+              <p>Get a concise AI summary</p>
+            </div>
+            <svg class="action-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </div>
+
+          <div class="action-card" onclick="goToSection('questions'); triggerQuestions()">
+            <div class="action-card-icon amber">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div>
+              <h3>Exam Questions</h3>
+              <p>Generate 5 key exam questions</p>
+            </div>
+            <svg class="action-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </div>
+
+          <div class="action-card" onclick="goToSection('chat')">
+            <div class="action-card-icon green">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            </div>
+            <div>
+              <h3>Ask Questions</h3>
+              <p>Chat with your notes</p>
+            </div>
+            <svg class="action-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- NOTES -->
+      <section class="section" id="section-notes">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">Extracted Notes</h1>
+            <p class="section-sub" id="notesSubtitle">Raw text from your file</p>
+          </div>
+          <button class="btn btn-ghost" onclick="copyText('notesContent')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy All
+          </button>
+        </div>
+        <div class="notes-display" id="notesContent"><span class="empty-text">No notes loaded yet.</span></div>
+      </section>
+
+      <!-- SUMMARY -->
+      <section class="section" id="section-summary">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">AI Summary</h1>
+            <p class="section-sub">Powered by Google Gemini</p>
+          </div>
+          <div style="display:flex;gap:0.6rem">
+            <button class="btn btn-ghost" id="copySummaryBtn" onclick="copyText('summaryContent')" style="display:none">Copy</button>
+            <button class="btn btn-primary" id="regenSummaryBtn" onclick="triggerSummarize()" style="display:none">Regenerate</button>
+          </div>
+        </div>
+        <div class="output-panel">
+          <div class="output-empty" id="summaryEmpty">
+            <div class="empty-orb cyan-orb"></div>
+            <p>Upload notes then click <strong>Summarize Notes</strong>.</p>
+            <button class="btn btn-primary" onclick="triggerSummarize()">Generate Summary</button>
+          </div>
+          <div class="output-content" id="summaryContent" style="display:none"></div>
+          <div class="output-loading" id="summaryLoading" style="display:none">
+            <div class="loading-dots"><span></span><span></span><span></span></div>
+            <span>Gemini is summarizing…</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- QUESTIONS -->
+      <section class="section" id="section-questions">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">Exam Questions</h1>
+            <p class="section-sub">5 high-value questions from your notes</p>
+          </div>
+          <div style="display:flex;gap:0.6rem">
+            <button class="btn btn-ghost" id="copyQBtn" onclick="copyQuestionsText()" style="display:none">Copy</button>
+            <button class="btn btn-primary" id="regenQBtn" onclick="triggerQuestions()" style="display:none">Regenerate</button>
+          </div>
+        </div>
+        <div class="output-panel">
+          <div class="output-empty" id="questionsEmpty">
+            <div class="empty-orb amber-orb"></div>
+            <p>Upload notes then click <strong>Exam Questions</strong>.</p>
+            <button class="btn btn-primary" onclick="triggerQuestions()">Generate Questions</button>
+          </div>
+          <div class="questions-list" id="questionsContent" style="display:none"></div>
+          <div class="output-loading" id="questionsLoading" style="display:none">
+            <div class="loading-dots"><span></span><span></span><span></span></div>
+            <span>Generating exam questions…</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHAT -->
+      <section class="section" id="section-chat">
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">Ask Your Notes</h1>
+            <p class="section-sub">Conversational Q&A powered by Gemini</p>
+          </div>
+          <button class="btn btn-ghost" onclick="clearChat()">Clear Chat</button>
+        </div>
+
+        <div class="chat-area" id="chatArea">
+          <div class="chat-welcome" id="chatWelcome">
+            <div class="welcome-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            </div>
+            <h3>Start a conversation</h3>
+            <p>Ask anything about your uploaded study notes.</p>
+            <div class="quick-questions">
+              <button class="quick-q" onclick="sendQuickQ(this)">What are the main topics?</button>
+              <button class="quick-q" onclick="sendQuickQ(this)">Explain the key concepts</button>
+              <button class="quick-q" onclick="sendQuickQ(this)">What should I focus on?</button>
+            </div>
+          </div>
+          <div class="chat-messages" id="chatMessages"></div>
+        </div>
+
+        <div class="chat-input-wrap">
+          <div class="chat-input-box">
+            <textarea id="chatInput" class="chat-textarea" placeholder="Ask a question about your notes…" rows="1" disabled></textarea>
+            <button class="send-btn" id="sendBtn" disabled onclick="sendChat()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+          <p class="chat-hint">Press <kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for new line</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
