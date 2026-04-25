@@ -1,37 +1,24 @@
-# NeuralStudy — DEMO MODE (No API Key Needed!)
+# 🧠 NeuralStudy — AI Study Assistant
 
-Works completely offline using smart text processing.
-Perfect for hackathon demos!
+> Built for [Hackathon Name] | Team: [Your Name]
 
----
+An AI-powered study tool that helps students learn smarter.
+Upload your notes and instantly get summaries, exam questions, and a smart chatbot.
 
-## Run in 3 Commands (Windows)
+## ✨ Features
+- 📄 Upload PDF, TXT, or Markdown notes
+- 🤖 AI-generated smart summary
+- ❓ Auto-generates 5 exam questions
+- 💬 Chat Q&A with your notes
+- ⚡ Real-time streaming responses
 
-Open CMD inside the project folder:
-
-```cmd
+## 🚀 Run Locally
 pip install -r requirements.txt
 cd backend
 python app.py
-```
+Then open frontend/index.html
 
-Then double-click `frontend/index.html` — done!
-
----
-
-## How It Works (No AI API)
-
-| Feature          | How it works                                      |
-|------------------|---------------------------------------------------|
-| Upload           | Reads TXT, PDF, Markdown files                    |
-| Summary          | Extracts top sentences using keyword scoring      |
-| Exam Questions   | Generates questions from key terms & definitions  |
-| Chat             | Finds most relevant passages to answer questions  |
-| Streaming        | Word-by-word typing effect (simulated streaming)  |
-
----
-
-## Supported Files
-- `.txt` — Plain text
-- `.md`  — Markdown
-- `.pdf` — PDF (needs pdfplumber, included)
+## 🛠 Tech Stack
+- Frontend: HTML, CSS, JavaScript
+- Backend: Python Flask
+- AI: Smart NLP text processing (no API needed)
